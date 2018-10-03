@@ -1,4 +1,4 @@
-public class Client{
+public class Application {
     public static void main (String args[]){
         Server senderDummyServer = new DummyServer("SenderDummyServer");
         Server receiverDummyServer = new DummyServer("ReceiverDummyServer");
@@ -13,6 +13,7 @@ public class Client{
         dummyMessage2.setBody("50 minutes availability");
         dummyMessage2.setSender(senderDummyServer);
         dummyMessage2.setReceiver(receiverDummyServer);
+
 
         System.out.println(dummyMessage1.getBody() + ":\n");
         System.out.println("Sender: " + dummyMessage1.getSender().getName());
