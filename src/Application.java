@@ -1,27 +1,21 @@
+import java.util.List;
+
 public class Application {
     public static void main (String args[]){
-        Server senderDummyServer = new DummyServer("SenderDummyServer");
-        Server receiverDummyServer = new DummyServer("ReceiverDummyServer");
 
-        Message dummyMessage1 = new DummyMessage(senderDummyServer,
-                receiverDummyServer,
-                60,
-                "60 minutes availability");
+        Server server = new Server();
 
-        Message dummyMessage2 = new DummyMessage();
-        dummyMessage2.setAvailability(40);
-        dummyMessage2.setBody("50 minutes availability");
-        dummyMessage2.setSender(senderDummyServer);
-        dummyMessage2.setReceiver(receiverDummyServer);
+        for (int i = 0; i < 5; i++) {
+            server.addUser(new LocalClient(server));
+        }
 
+        List<LocalClient> localClients = server.getLocalClients();
 
-        System.out.println(dummyMessage1.getBody() + ":\n");
-        System.out.println("Sender: " + dummyMessage1.getSender().getName());
-        System.out.println("Receiver: " + dummyMessage1.getReceiver().getName());
-        System.out.println();
-        System.out.println(dummyMessage2.getBody() + ":\n");
-        System.out.println("Sender: " + dummyMessage2.getSender().getName());
-        System.out.println("Receiver: " + dummyMessage2.getReceiver().getName());
+        for (user:
+             localClients) {
+            user.start();
+        }
+
 
     }
 }

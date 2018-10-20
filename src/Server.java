@@ -1,27 +1,40 @@
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.List;
 
 //https://codereview.stackexchange.com/questions/38557/concurrent-multi-server-pinging-in-java
 //TODO:See above for example of pinging (check out user messages)
 
 
-public abstract class Server{
+public class Server {
 
     //TODO:We also need a user input reader (with menu)
 
     private String name = "Server";
+    private List<LocalClient> localClients;
+    private List<Message> messages;
 
+
+    public void addUser(LocalClient localClient) {
+        localClients.add(localClient);
+    }
+
+    public List<LocalClient> getLocalClients() {
+        return localClients;
+    }
+
+    public synchronized void addMessage(Message message) {
+        messages.add(message);
+        //find destination
+
+    }
+
+    Server() {
+        localClients = new ArrayList<>();
+        messages = new ArrayList<>();
+    }
     Server(String name){
+        this();
         this.name = name;
-        final ExecutorService executorService = Executors.newFixedThreadPool(4);
-        //return value is null if run was succesful
-        Future<?> runResult = executorService.submit(new User());
-
-
-        BlockingQueue<Runnable> work =
-                new ArrayBlockingQueue<Runnable>(5);
-
-        //or we could use Callable instead of Runnable
-//        executorService.submit()
 
     }
 
