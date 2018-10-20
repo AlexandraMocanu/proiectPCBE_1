@@ -1,16 +1,16 @@
 public class MessageForQueue extends Message{
 
-    public String sender;
+    public String receiver;
     MessageForQueue(String body, String sender){
         super(body);
-        this.sender = sender;
+        this.receiver = sender;
     }
 
-    public void setSender(String sender) {
-        this.sender = sender;
+    public void setReceiver(String sender) {
+        this.receiver = sender;
     }
 
-    public String getSender() {
-        return sender;
+    public String getReceiver() {
+        return receiver;
     }
 }

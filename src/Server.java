@@ -1,31 +1,33 @@
 import java.util.ArrayList;
-import java.util.concurrent.*;
 
-//https://codereview.stackexchange.com/questions/38557/concurrent-multi-server-pinging-in-java
-//TODO:See above for example of pinging (check out user messages)
-
-
-public class Server{
+public class Server {
 
     //TODO:We also need a user input reader (with menu)
+    //TODO:receive different message and forward them to corresponding clients
+    //TODO:create threads for clients (receiving messages) and sending of messages (topic and queue)
 
-    private ArrayList<Client> clientList = new ArrayList<Client>();
+    private ArrayList<Client> clients;
+    private ArrayList<MessageQueue> messagesQueue;
+    private ArrayList<Topic> messagesTopic;
     private String name = "Server";
 
-    Server(String name){
+    Server(String name) {
+        clients = new ArrayList<>();
+        messagesQueue = new ArrayList<>();
+        messagesTopic = new ArrayList<>();
         this.name = name;
     }
 
-    public String getName() {
-        return name;
+    public void registerClient(LocalClient localClient) {
+        clients.add(localClient);
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public ArrayList<Client> getClients() {
+        return clients;
     }
 
-    public void registerClient(Client client){
-        this.clientList.add(client);
+    public synchronized void addMessage(MessageBroker message) {
+        //messages.add(message);
     }
 
 }

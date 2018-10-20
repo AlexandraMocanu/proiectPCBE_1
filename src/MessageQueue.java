@@ -19,9 +19,9 @@ public class MessageQueue implements MessageBroker{
         return maxMsg;
     }
 
-    public void addMsg(MessageForQueue msg){
+    public void addMsg(Message msg){
         if(messageQueue.size() < maxMsg){
-            messageQueue.add(msg);
+            messageQueue.add((MessageForQueue)msg);
         }
         else {
             //ignore msg

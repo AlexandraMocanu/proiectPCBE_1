@@ -6,8 +6,8 @@ public class Topic implements MessageBroker{
 
     Topic(){ }
 
-    public void addMsg(MessageForTopic msg, String topic){
-        messageQueue.add(msg);
+    public void addMsg(Message msg){
+        messageQueue.add((MessageForTopic) msg);
     }
     public Message getMessage(){
         return messageQueue.getFirst();

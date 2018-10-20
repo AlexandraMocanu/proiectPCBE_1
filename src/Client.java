@@ -1,17 +1,13 @@
-public class Client implements Runnable{
+public interface Client extends Runnable{
 
-    private String Name;
+    String getName();
 
-    Client(String name){
-        this.Name = name;
-    }
+    void sendMessage(MessageBroker message);
+    Message receiveMessage();
 
-    public void registerToServer(Server server){
-        server.registerClient(this);
-    }
+    MessageForTopic buildTopic(String body, String tag);
+    MessageForQueue buildMessage(String body, String username);
 
-    @Override
-    public void run() {
+    void registerToServer();
 
-    }
 }
