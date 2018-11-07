@@ -10,7 +10,7 @@ public class MessageForQueue extends Message {
         this.receiver = sender;
     }
 
-    public String getReceiver() {
+    String getReceiver() {
         return receiver;
     }
 

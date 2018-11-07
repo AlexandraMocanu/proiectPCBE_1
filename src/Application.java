@@ -20,7 +20,7 @@ public class Application {
 
         // start
 
-        server.startServer();
+//        server.startServer();
         for (Client client: clients) {
             client.startClient();
         }

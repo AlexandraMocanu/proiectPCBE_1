@@ -7,8 +7,8 @@ public class Server {
     //TODO:create threads for clients (receiving messages) and sending of messages (topic and queue)
 
     private ArrayList<Client> clients;
-    private ArrayList<MessageForQueue> messagesQueue;
-    private ArrayList<MessageForTopic> messagesTopic;
+    private final ArrayList<MessageForQueue> messagesQueue;
+    private final ArrayList<MessageForTopic> messagesTopic;
     private String name = "Server";
 
     Server(String name) {
@@ -35,36 +35,30 @@ public class Server {
         System.out.println(message);
     }
 
-    public synchronized Message getMessage(String type, String params) {
-        if (type == "topic")
+    public Message getMessage(String type, String params) {
+        if (type.equals("topic"))
             return this.getTopicMessage(params);
         else
             return this.getQueueMessage(params);
     }
 
-    public Message getTopicMessage(String params) {
+    private Message getTopicMessage(String params) {
         for (MessageForTopic msg : messagesTopic) {
-            if (msg.getType() == params)
+            if (msg.getType().equals(params))
                 return msg;
         }
         return null;
     }
 
-    public synchronized Message getQueueMessage(String params) {
+    private synchronized Message getQueueMessage(String params) {
         synchronized (messagesQueue) {
-            System.out.println("Got here with queue: " + messagesQueue.size());
             for (MessageForQueue msg : messagesQueue)
-                if (msg.getReceiver() == params) {
-                    Message retVal = msg;
+                if (msg.getReceiver().equals(params)) {
                     messagesQueue.remove(msg);
-                    return retVal;
+                    return msg;
                 }
         }
         return null;
-    }
-
-    public void startServer() {
-
     }
 
 }

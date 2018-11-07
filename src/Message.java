@@ -9,7 +9,7 @@ public class Message {
         this.body = body;
     }
 
-    public String getBody() {
+    String getBody() {
         return body;
     }
 
