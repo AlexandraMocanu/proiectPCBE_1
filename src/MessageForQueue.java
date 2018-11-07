@@ -1,6 +1,6 @@
-public class MessageForQueue extends Message{
+public class MessageForQueue extends Message {
 
-    public String receiver;
+    private String receiver;
     MessageForQueue(String body, String sender){
         super(body);
         this.receiver = sender;
@@ -13,4 +13,5 @@ public class MessageForQueue extends Message{
     public String getReceiver() {
         return receiver;
     }
+
 }

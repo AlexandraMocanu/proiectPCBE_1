@@ -8,16 +8,45 @@ public class LocalClient implements Client {
     private static int userCount = 1;
     private String name;
     private Server server;
-    private List<Message> messages;
+    Thread sendMessagesHandler;
+    Thread recvMessagesHandler;
+    private String type;
 
-    public LocalClient(Server server) {
+    public LocalClient(String type) {
         this.name = "User_" + userCount++;
-        this.server = server;
-        this.messages = new ArrayList<>();
+        this.type = type;
+        this.sendMessagesHandler = new Thread(() -> {
+            while(true) {
+                try {
+                    Message aux;
+                    if (type == "topic")
+                        aux = new MessageForTopic("topic are mere " + this.name, "whatever");
+                    else
+                        aux = new MessageForQueue("queue are mere", "albastru");
+                    server.addMessage(aux);
+                    Thread.sleep(1000);
+                } catch (InterruptedException ie) {
+                    System.out.println(ie);
+                }
+            }
+        });
+        this.recvMessagesHandler = new Thread(() -> {
+           while (true) {
+                   try {
+                       String params = (type == "topic") ? "whatever" : "albastru";
+                       Message msg = server.getMessage(type, params);
+                       if (msg != null)
+                           System.out.println(this.name + " received message: " + msg.getBody());
+                       Thread.sleep(2000);
+                   } catch (InterruptedException ie) {
+                       System.out.println(ie);
+                   }
+           }
+        });
     }
 
-    public LocalClient(Server server, String name) {
-        this(server);
+    public LocalClient(String name, String type) {
+        this(type);
         this.name = name;
     }
 
@@ -27,12 +56,14 @@ public class LocalClient implements Client {
     }
 
     @Override
-    public void sendMessage(MessageBroker message) {
-
+    public void sendMessage() {
+//        this.server.addMessage(message);
+        return;
     }
 
     @Override
-    public Message receiveMessage() {
+    public Message receiveMessage(Message message) {
+        System.out.println(message);
         return null;
     }
 
@@ -46,13 +77,23 @@ public class LocalClient implements Client {
         return null;
     }
 
-    public void registerToServer(){
-        server.registerClient(this);
+    @Override
+    public void registerServer(Server server){
+        this.server = server;
+    }
+
+    @Override
+    public void startClient() {
+        sendMessagesHandler.start();
+        recvMessagesHandler.start();
     }
 
     @Override
     public void run() {
-        //take input, do what user asks
+//         this.sendMessagesHandler = new Thread(() -> {
+//                 Message aux = new MessageForTopic("ana are mere", "whatever");
+//                 server.addMessage(aux);
+//        });
     }
 
 }

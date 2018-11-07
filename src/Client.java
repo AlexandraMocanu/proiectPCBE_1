@@ -1,13 +1,13 @@
-public interface Client extends Runnable{
+public interface Client extends Runnable {
 
     String getName();
 
-    void sendMessage(MessageBroker message);
-    Message receiveMessage();
+    void sendMessage();
+    Message receiveMessage(Message message);
 
     MessageForTopic buildTopic(String body, String tag);
     MessageForQueue buildMessage(String body, String username);
 
-    void registerToServer();
-
+    void registerServer(Server server);
+    void startClient();
 }
