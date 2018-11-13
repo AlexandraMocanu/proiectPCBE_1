@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Server {
 
@@ -27,12 +28,14 @@ public class Server {
     }
 
     public synchronized void addMessage(Message message) {
-        if (message instanceof MessageForTopic)
+        if (message instanceof MessageForTopic) {
             messagesTopic.add((MessageForTopic) message);
-        else if (message instanceof MessageForQueue)
+            System.out.println("[TOPIC]:" + message);
+        }
+        else if (message instanceof MessageForQueue) {
             messagesQueue.add((MessageForQueue) message);
+        }
 
-        System.out.println(message);
     }
 
     public Message getMessage(String type, String params) {
@@ -42,12 +45,19 @@ public class Server {
             return this.getQueueMessage(params);
     }
 
-    private Message getTopicMessage(String params) {
-        for (MessageForTopic msg : messagesTopic) {
-            if (msg.getType().equals(params))
-                return msg;
+    private synchronized Message getTopicMessage(String params) {
+        synchronized (messagesTopic) {
+            Iterator<MessageForTopic> iter = messagesTopic.iterator(); ;
+            while (iter.hasNext()) {
+                MessageForTopic msg = iter.next();
+                Long expire = msg.getExpire();
+                if (expire != null && expire > System.currentTimeMillis()) {
+                    iter.remove();
+                } else if (msg.getType().equals(params))
+                    return msg;
+            }
+            return null;
         }
-        return null;
     }
 
     private synchronized Message getQueueMessage(String params) {
