@@ -1,18 +1,18 @@
 import java.util.LinkedList;
 
-public class MessageQueue implements MessageBroker{
+public class Queue implements MessageBroker{
 
     private static int maxMsg = 1000;
     private LinkedList<MessageForQueue> messageQueue = new LinkedList<MessageForQueue>();
 
-    MessageQueue(int maxMsg){
+    Queue(int maxMsg){
         this.maxMsg = maxMsg;
     }
 
-    MessageQueue(){  }
+    Queue(){  }
 
     public static void setMaxMsg(int maxMsg) {
-        MessageQueue.maxMsg = maxMsg;
+        Queue.maxMsg = maxMsg;
     }
 
     public static int getMaxMsg() {
@@ -29,10 +29,23 @@ public class MessageQueue implements MessageBroker{
         }
     }
 
-    public Message getMessage(){
+    public Message getMessage(int i){
+        return messageQueue.get(i);
+    }
+
+    public Message getFirstMsg(){
         Message msg = messageQueue.getFirst();
         messageQueue.removeFirst();
         return msg;
     }
 
+    @Override
+    public int getSize() {
+         return messageQueue.size();
+    }
+
+    @Override
+    public void removeMsg(int i) {
+        messageQueue.remove(i);
+    }
 }

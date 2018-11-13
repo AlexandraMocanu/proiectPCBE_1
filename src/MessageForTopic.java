@@ -3,8 +3,8 @@ public class MessageForTopic extends Message {
     private Long expire;
     private String type;
 
-    MessageForTopic(String body, Long expire, String type){
-        super(body);
+    MessageForTopic(String body, String sender, Long expire, String type){
+        super(body, sender);
         this.expire = expire;
         this.type = type;
     }

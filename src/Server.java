@@ -1,22 +1,64 @@
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.*;
 
-public class Server {
-
-    //TODO:We also need a user input reader (with menu)
-    //TODO:receive different message and forward them to corresponding clients
-    //TODO:create threads for clients (receiving messages) and sending of messages (topic and queue)
+public class Server{
 
     private ArrayList<Client> clients;
-    private final ArrayList<MessageForQueue> messagesQueue;
-    private final ArrayList<MessageForTopic> messagesTopic;
+    private final Queue messagesQueue;
+    private final Topic messagesTopic;
+    private final HashMap<Message, ArrayList<Client>> sent;
     private String name = "Server";
+    private Thread admin;
 
     Server(String name) {
         clients = new ArrayList<>();
-        messagesQueue = new ArrayList<>();
-        messagesTopic = new ArrayList<>();
+        messagesQueue = new Queue();
+        messagesTopic = new Topic();
+        sent = new HashMap<>();
         this.name = name;
+
+        this.admin = new Thread(() -> {
+            while(true){
+                for(int i = 0; i < clients.size(); i++){
+                    synchronized (messagesTopic) {
+                        for (int j = 0; j < messagesTopic.getSize(); j++) {
+                            if (clients.get(i).getTopicSubs().
+                                    contains(((MessageForTopic) messagesTopic.getMessage(j)).getType())) {
+
+                                ArrayList<Client> aux = sent.get(messagesTopic.getMessage(j));
+                                if(!aux.contains(clients.get(i))){
+                                    clients.get(i).receiveMessage(messagesTopic.getMessage(j));
+
+                                    ArrayList<Client> newC = sent.get(messagesTopic.getMessage(j));
+                                    newC.add(clients.get(i));
+                                    sent.put(messagesTopic.getMessage(j), newC);
+                                    System.out.println("Server sent message " + messagesTopic.getMessage(j) +
+                                            " to client " + clients.get(j).getName());
+                                }
+                            }
+                        }
+                    }
+
+                    synchronized (messagesQueue) {
+                        for (int j = 0; j < messagesQueue.getSize(); j++) {
+                            if (clients.get(i).getName().equals(
+                                    ((MessageForQueue) messagesQueue.getMessage(j)).getReceiver())) {
+                                clients.get(i).receiveMessage(messagesQueue.getMessage(j));
+                                System.out.println("Server sent message " + messagesQueue.getMessage(j) +
+                                        " to client " + clients.get(j).getName());
+                                System.out.println("Server removed message " + messagesQueue.getMessage(j));
+                                messagesQueue.removeMsg(j);
+                            }
+                        }
+                    }
+                }
+
+                processTopic();
+            }
+        });
+    }
+
+    public void start(){
+        admin.start();
     }
 
     public void registerClient(Client localClient) {
@@ -29,46 +71,58 @@ public class Server {
 
     public synchronized void addMessage(Message message) {
         if (message instanceof MessageForTopic) {
-            messagesTopic.add((MessageForTopic) message);
-            System.out.println("[TOPIC]:" + message);
+            synchronized (messagesTopic) {
+                messagesTopic.addMsg(message);
+                ArrayList<Client> cl = new ArrayList<>();
+                sent.put(message, cl);
+            }
+            System.out.println("Server received [TOPIC]:" + message);
         }
         else if (message instanceof MessageForQueue) {
-            messagesQueue.add((MessageForQueue) message);
-        }
-
-    }
-
-    public Message getMessage(String type, String params) {
-        if (type.equals("topic"))
-            return this.getTopicMessage(params);
-        else
-            return this.getQueueMessage(params);
-    }
-
-    private synchronized Message getTopicMessage(String params) {
-        synchronized (messagesTopic) {
-            Iterator<MessageForTopic> iter = messagesTopic.iterator(); ;
-            while (iter.hasNext()) {
-                MessageForTopic msg = iter.next();
-                Long expire = msg.getExpire();
-                if (expire != null && expire > System.currentTimeMillis()) {
-                    iter.remove();
-                } else if (msg.getType().equals(params))
-                    return msg;
+            synchronized (messagesQueue) {
+                messagesQueue.addMsg(message);
             }
-            return null;
+            System.out.println("Server received [QUEUE]:" + message);
+        }
+
+    }
+
+    public synchronized void processTopic(){
+        synchronized (messagesTopic) {
+            for (int i = 0; i < messagesTopic.getSize(); i++) {
+                Long expire = ((MessageForTopic)messagesTopic.getMessage(i)).getExpire();
+                Long end = System.currentTimeMillis()/10000000;
+                if (expire != null && expire < end) {
+                    System.out.println("Server removed [TOPIC]:" + messagesTopic.getMessage(i) +
+                            " after " + expire/1000 + " seconds have passed since publication.");
+                    messagesTopic.removeMsg(i);
+                }
+            }
         }
     }
 
-    private synchronized Message getQueueMessage(String params) {
-        synchronized (messagesQueue) {
-            for (MessageForQueue msg : messagesQueue)
-                if (msg.getReceiver().equals(params)) {
-                    messagesQueue.remove(msg);
-                    return msg;
-                }
-        }
-        return null;
-    }
+//    private synchronized Message getTopicMessage(String params) {
+//        synchronized (messagesTopic) {
+//            for (int i = 0; i < messagesTopic.getSize(); i++) {
+//                Long expire = ((MessageForTopic)messagesTopic.getMessage(i)).getExpire();
+//                if (expire != null && expire > System.currentTimeMillis()) {
+//                    messagesTopic.removeMsg(i);
+//                } else if (msg.getType().equals(params))
+//                    return msg;
+//            }
+//            return null;
+//        }
+//    }
+//
+//    private synchronized Message getQueueMessage(String params) {
+//        synchronized (messagesQueue) {
+//            for (MessageForQueue msg : messagesQueue)
+//                if (msg.getReceiver().equals(params)) {
+//                    messagesQueue.remove(msg);
+//                    return msg;
+//                }
+//        }
+//        return null;
+//    }
 
 }

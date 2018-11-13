@@ -1,8 +1,10 @@
 public class Message {
     private String body;
+    private String sender;
 
-    Message(String body){
+    Message(String body, String sender){
         this.body = body;
+        this.sender = sender;
     }
 
     public void setBody(String body) {
@@ -11,6 +13,10 @@ public class Message {
 
     String getBody() {
         return body;
+    }
+
+    public String getSender() {
+        return sender;
     }
 
     @Override
